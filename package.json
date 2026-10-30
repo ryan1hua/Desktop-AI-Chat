@@ -1,0 +1,39 @@
+{
+  "name": "deepseek-chat",
+  "version": "1.0.0",
+  "description": "DeepSeek 对话客户端 · 纯白极简 Flat Design",
+  "main": "main.js",
+  "scripts": {
+    "start": "node launch.js",
+    "dist": "electron-builder --win"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.2.8",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "mammoth": "^1.13.0",
+    "pdf-parse": "^2.4.5",
+    "uiohook-napi": "^1.5.5"
+  },
+  "build": {
+    "appId": "com.deepseek.chat",
+    "productName": "Desktop Chat",
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "asarUnpack": [
+      "**/*.node"
+    ]
+  }
+}

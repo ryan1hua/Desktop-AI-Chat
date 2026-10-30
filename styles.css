@@ -1,0 +1,746 @@
+/* ============================================================
+   styles.css —— 界面的样式（配色、圆角、间距、布局）
+   ------------------------------------------------------------
+   这里是「Flat Design 纯白极简」风格的核心：
+     - 主背景是纯白
+     - 唯一的彩色是蓝色（--accent），用在强调的地方
+     - 圆角、细边框、几乎不用阴影
+   改配色只需要改下面 :root 里的变量即可。
+   ============================================================ */
+
+/* —— 定义「设计变量」：想换颜色/圆角，改这里就行 —— */
+:root {
+  --bg: #ffffff;              /* 主背景：纯白 */
+  --bg-soft: #f7f8fa;         /* 浅灰背景：用于气泡、悬停 */
+  --border: #ececf0;          /* 浅边框 */
+  --border-strong: #e2e3e8;   /* 深一点的边框 */
+  --text: #1f2329;            /* 主文字：近黑 */
+  --text-secondary: #8a919f;  /* 次要文字：灰 */
+  --accent: #4d6bfe;          /* 强调色：蓝（唯一彩色） */
+  --accent-hover: #3c5ae8;    /* 蓝色按下时更深一点 */
+  --accent-soft: #eef1ff;     /* 很淡的蓝，用于背景 */
+  --radius: 14px;             /* 通用圆角大小 */
+  --font: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+/* 清除浏览器默认的外边距和内边距 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 让 HTML 的 hidden 属性「一定」生效。
+   否则像 .modal-overlay 这样写了 display: flex 的元素，
+   会被 display 覆盖掉 hidden 的隐藏效果，导致弹窗关不掉。 */
+[hidden] {
+  display: none !important;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased; /* 让字体更平滑 */
+  overflow: hidden; /* 整个应用不出现滚动条（对话区自己滚） */
+}
+
+/* 应用整体：纵向三块（顶栏 / 对话区 / 输入区） */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* 占满整个窗口 */
+}
+
+/* ============ 顶部栏 ============ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 左右两端对齐 */
+  height: 56px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg);
+  -webkit-app-region: drag; /* 允许按住顶栏拖动窗口 */
+}
+
+/* 按钮不能触发「拖动窗口」，要恢复成可点击 */
+.topbar button,
+.topbar .dropdown {
+  -webkit-app-region: no-drag;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 蓝色小圆点（品牌标志） */
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* 欢迎语里的「大圆点」版本 */
+.brand-dot.big {
+  width: 28px;
+  height: 28px;
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 图标按钮（齿轮、关闭等） */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.icon-btn:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+/* ============ 模型选择下拉 ============ */
+.dropdown {
+  position: relative; /* 让下拉菜单相对它定位 */
+}
+
+/* 胶囊形状的按钮 */
+.dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 999px; /* 999px = 完全圆角 = 胶囊形 */
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.dropdown-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.chevron {
+  color: var(--text-secondary);
+  transition: transform 0.15s;
+}
+
+/* 展开菜单时，小箭头旋转 180 度变成朝上 */
+.dropdown.open .chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 220px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(31, 35, 41, 0.08);
+  padding: 6px;
+  display: none; /* 默认隐藏 */
+  z-index: 20;
+}
+
+.dropdown.open .dropdown-menu {
+  display: block; /* 展开时才显示 */
+}
+
+.dropdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-soft);
+}
+
+/* 当前选中的模型高亮 */
+.dropdown-item.selected {
+  background: var(--accent-soft);
+}
+
+.item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dropdown-item.selected .item-title {
+  color: var(--accent);
+}
+
+.item-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ============ 对话区 ============ */
+.chat {
+  flex: 1; /* 占满中间剩余空间 */
+  overflow-y: auto; /* 内容多了自己滚动 */
+  padding: 24px 20px 12px;
+  background: var(--bg);
+}
+
+/* 欢迎语：居中，发第一条消息后会被隐藏 */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16vh;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.welcome-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+}
+
+.welcome h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.welcome p {
+  font-size: 13px;
+}
+
+/* 一条消息（头像 + 气泡） */
+.message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 22px;
+  animation: rise 0.2s ease; /* 出现时轻微上浮 */
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 用户消息靠右（头像和气泡顺序反过来） */
+.message.user {
+  flex-direction: row-reverse;
+}
+
+/* 头像：圆形，里面显示「我」或「DS」 */
+.avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.message.assistant .avatar {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.message.user .avatar {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 气泡：聊天的文字块 */
+.bubble {
+  max-width: 72%;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.65;
+  word-break: break-word;
+  white-space: pre-wrap; /* 保留换行 */
+}
+
+/* AI 的气泡：浅灰底，左上角是尖的（像聊天气泡） */
+.message.assistant .bubble {
+  background: var(--bg-soft);
+  color: var(--text);
+  border-top-left-radius: 4px;
+}
+
+/* 用户的气泡：蓝底白字，右上角是尖的 */
+.message.user .bubble {
+  background: var(--accent);
+  color: #fff;
+  border-top-right-radius: 4px;
+}
+
+/* 思考过程折叠框（在回答上方，默认折叠，点标题展开） */
+.reasoning-box {
+  margin-bottom: 8px;
+  max-width: 72%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.reasoning-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.reasoning-header:hover {
+  color: var(--text);
+}
+
+.reasoning-header .chevron {
+  transition: transform 0.15s;
+}
+
+/* 展开时小箭头翻转 */
+.reasoning-box.open .reasoning-header .chevron {
+  transform: rotate(180deg);
+}
+
+.reasoning-content {
+  padding: 8px 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  border-top: 1px solid var(--border);
+}
+
+/* 正在生成时，末尾闪烁的光标 */
+.cursor::after {
+  content: '▍';
+  color: var(--accent);
+  animation: blink 1s steps(1) infinite;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ============ 底部输入区 ============ */
+.composer {
+  flex-shrink: 0;
+  padding: 8px 16px 10px;
+  background: var(--bg);
+}
+
+.composer-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  background: var(--bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+/* 输入框获得焦点（点进去）时，边框变蓝、加一圈淡蓝光 */
+.composer-inner:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+#input {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none; /* 不让用户手动拖拽大小 */
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: transparent;
+  max-height: 160px;
+}
+
+#input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* 发送按钮（蓝色方块 + 纸飞机） */
+.send-btn {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.send-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* 等待回复时，发送按钮变淡、不可点 */
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.composer-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  user-select: none;
+}
+
+/* ============ 设置弹窗 ============ */
+/* 半透明黑色遮罩，盖住整个屏幕 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 35, 41, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  width: 420px;
+  max-width: calc(100vw - 48px);
+  background: var(--bg);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: rise 0.2s ease;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-head h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 20px;
+  /* 内容太多时（比如项目管理弹窗）让中间区域自己滚动，避免超出屏幕 */
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.field-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.field-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.field-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.field-link:hover {
+  text-decoration: underline;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* 两种按钮：普通（白底灰边）和主要（蓝底白字） */
+.btn-ghost,
+.btn-primary {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.btn-ghost {
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-soft);
+}
+
+.btn-primary {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+/* ============ 附件 ============ */
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.chip-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.chip-del:hover {
+  background: var(--border-strong);
+  color: var(--text);
+}
+
+/* 用户气泡里的图片缩略图 */
+.attach-thumb {
+  display: block;
+  max-width: 240px;
+  max-height: 180px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+/* 用户气泡里的文件小标签 */
+.attach-file-chip {
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* ============ 项目管理弹窗 ============ */
+/* 弹窗里字段之间的间距 */
+.modal-body .field-input {
+  margin-bottom: 16px;
+}
+
+/* 多行文本框（前置提示） */
+.field-textarea {
+  height: auto;
+  min-height: 80px;
+  padding: 10px 12px;
+  resize: vertical;
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+/* 知识库文件列表 */
+.kb-list {
+  margin-bottom: 8px;
+}
+
+.kb-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.kb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+/* 小号按钮（知识库「添加」用） */
+.btn-small {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 12.5px;
+}
+
+/* 危险操作区（删除项目） */
+.modal-danger {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-danger {
+  height: 36px;
+  padding: 0 18px;
+  border: 1px solid #f5c6c6;
+  background: #fff5f5;
+  color: #d9534f;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-danger:hover {
+  background: #fdeaea;
+}
+
+/* 下拉菜单里的分隔线 */
+.dropdown-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 4px;
+}
+
+/* ============ 语音输入 ============ */
+/* 语音状态提示（加载 / 录音 / 识别时显示） */
+.mic-state {
+  text-align: center;
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 4px;
+  min-height: 14px;
+  user-select: none;
+}
+
+.mic-state:empty {
+  display: none;
+}
+
+/* 录音中：麦克风按钮变红并呼吸闪烁 */
+.icon-btn.recording {
+  background: #feeceb;
+  color: #e5484d;
+  animation: micPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(229, 72, 77, 0); }
+}

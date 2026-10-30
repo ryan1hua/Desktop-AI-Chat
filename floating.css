@@ -1,0 +1,263 @@
+/* ============================================================
+   floating.css —— 悬浮窗样式（全透明极简）
+   ------------------------------------------------------------
+   窗口背景全透明，无任何颜色。
+   只有「消息框」保留毛玻璃白色（方便阅读文字），
+   麦克风按钮、气泡菜单都是透明底，只显示图标/文字。
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* hidden 属性必须生效（否则 display:flex 等规则会覆盖掉它） */
+[hidden] {
+  display: none !important;
+}
+
+html, body {
+  background: transparent; /* 窗口背景全透明，无白色或其他颜色 */
+  overflow: hidden;
+  height: 100%;
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+.float-root {
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 透明区域不挡鼠标 */
+}
+
+/* —— 麦克风按钮（消息框右边、识别文字框高度，气泡围绕它形成右半圆） —— */
+.mic-btn {
+  position: absolute;
+  left: 350px;
+  bottom: 95px;
+  transform: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 60%;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #4d6bfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  pointer-events: auto; /* 可点击/拖动 */
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.mic-btn:hover {
+  background: rgba(255, 255, 255, 0.48);
+  border-color: rgba(255,255,255,0.7);
+}
+.mic-btn:active { color: #2f4ad6; }
+
+/* 录音中：红色光晕呼吸（供录音按钮使用） */
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(229, 72, 77, 0); }
+}
+
+/* —— 待发送附件提示（麦克风按钮正上方） —— */
+.attach-chip {
+  position: absolute;
+  left: 50%;
+  top: 32%;
+  transform: translateX(-50%);
+  max-width: 240px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.72);
+  border: none;
+  box-shadow: none;
+  font-size: 12px;
+  color: #5b616963;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none; /* 只做提示，不挡鼠标 */
+}
+
+/* —— 消息框区（左下角，气泡在右侧、消息框在左侧，互不干扰） —— */
+.msg-area {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.msg-box {
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: auto; /* 可悬停 */
+}
+
+.msg-box.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.msg-label {
+  font-size: 11px;
+  color: #8a919f;
+  margin-bottom: 4px;
+}
+
+.msg-text {
+  font-size: 13px;
+  color: #1f2329;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* —— 气泡菜单容器（铺满窗口，本身不挡鼠标，气泡可点） —— */
+.bubble-wrap {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* —— 气泡（亚克力风格：半透明白 + 模糊 + 描边 + 投影） —— */
+.bubble {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+  color: #1f2329;
+  font-family: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(26px) scale(0.55);
+}
+
+.bubble:hover {
+  background: rgba(255, 255, 255, 0.82);
+  color: #4d6bfe;
+}
+
+.bubble-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.bubble-label {
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 出水式弹出：速度由快变慢（cubic-bezier 前快后慢） */
+.bubble.pop {
+  animation: bubblePop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bubblePop {
+  0%   { opacity: 0; transform: translateY(26px) scale(0.55); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* —— 输入面板（点麦克风后出现）：输入框 + 录音按钮 —— */
+.input-panel {
+  position: absolute;
+  /* 麦克风left(350) 减去面板宽度202px，再减去12px间距，放到按钮左边 */
+  left: calc(350px - 202px - 12px);
+  bottom: 35px;
+  transform: translateY(50%);
+  width: 202px;
+  height: 120px;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.float-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 170px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #1f2329;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.5;
+  pointer-events: auto;
+}
+.record-btn {
+  position: absolute;
+  left: 178px;
+  top: 18px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #4d6bfe;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+}
+.record-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+.record-btn.recording {
+  color: #e5484d;
+  animation: micPulse 1.2s ease-in-out infinite;
+}
+
+/* 入场：和气泡相同的出水动画 */
+.input-panel.pop {
+  animation: panelPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 消失：和消息框相同的渐隐 */
+.input-panel.fade-out {
+  opacity: 0;
+}
+
+@keyframes panelPop {
+  0%   { opacity: 0; transform: translateY(26px) scale(0.55); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* —— 空闲收起态：窗口被主进程右移，只有麦克风左半边露在屏内 —— */
+body.collapsed .msg-area,
+body.collapsed .attach-chip,
+body.collapsed .bubble-wrap,
+body.collapsed .input-panel {
+  display: none !important;
+}

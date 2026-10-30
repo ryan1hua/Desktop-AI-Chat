@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>悬浮窗</title>
+  <link rel="stylesheet" href="floating.css" />
+</head>
+<body>
+  <div class="float-root">
+    <!-- 消息框区（悬浮窗左侧） -->
+    <div class="msg-area">
+      <div class="msg-box" id="userBox" hidden>
+        <div class="msg-label">🎤 识别</div>
+        <div class="msg-text" id="userText"></div>
+      </div>
+      <div class="msg-box" id="aiBox" hidden>
+        <div class="msg-label">🤖 AI</div>
+        <div class="msg-text" id="aiText"></div>
+      </div>
+    </div>
+
+    <!-- 待发送附件提示（右键「输入文件 / 输入粘贴栏」后显示） -->
+    <div class="attach-chip" id="attachChip" hidden></div>
+
+    <!-- 右键气泡菜单（圆形气泡，大小不等，环绕在右侧半圆，出水式弹出） -->
+    <div class="bubble-wrap" id="bubbleMenu" hidden>
+      <button class="bubble" data-action="model" data-size="80"><span class="bubble-icon">🧠</span><span class="bubble-label">选择模型</span></button>
+      <button class="bubble" data-action="main" data-size="50"><span class="bubble-icon">🖥</span><span class="bubble-label">主界面</span></button>
+      <button class="bubble" data-action="file" data-size="58"><span class="bubble-icon">🔗</span><span class="bubble-label">文件</span></button>
+      <button class="bubble" data-action="clipboard" data-size="72"><span class="bubble-icon">📋</span><span class="bubble-label">粘贴栏</span></button>
+      <button class="bubble" data-action="quit" data-size="50"><span class="bubble-icon">⏻</span><span class="bubble-label">退出</span></button>
+    </div>
+
+    <!-- 选择模型后的模型气泡子菜单 -->
+    <div class="bubble-wrap" id="modelMenu" hidden>
+      <button class="bubble" data-model="deepseek-v4-pro" data-size="82"><span class="bubble-icon">⚡</span><span class="bubble-label">V4 PRO</span></button>
+      <button class="bubble" data-model="deepseek-chat" data-size="70"><span class="bubble-icon">💬</span><span class="bubble-label">V3</span></button>
+      <button class="bubble" data-model="deepseek-reasoner" data-size="76"><span class="bubble-icon">🧠</span><span class="bubble-label">R1</span></button>
+      <button class="bubble" data-model="glm-4-flash" data-size="66"><span class="bubble-icon">✨</span><span class="bubble-label">GLM</span></button>
+    </div>
+
+    <!-- 输入面板（点麦克风后出现）：输入框 + 录音按钮 -->
+    <div class="input-panel" id="inputPanel" hidden>
+      <textarea class="float-input" id="floatInput" placeholder="输入内容，回车发送给 AI"></textarea>
+      <button class="record-btn" id="recordBtn" title="录音">
+        <span class="record-icon">🎤</span>
+      </button>
+    </div>
+
+    <!-- 麦克风按钮（右下角） -->
+    <button class="mic-btn" id="micBtn" title="点击打开输入框">
+      <img src="icon.png" draggable="false" style="width:22px;height:22px;pointer-events:none" />
+      <!--
+      <svg viewBox="0 0 24 24" width="22" height="22">
+        <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M19 11a7 7 0 0 1-14 0M12 18v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      -->
+    </button>
+  </div>
+  <script src="floating.js"></script>
+</body>
+</html>
